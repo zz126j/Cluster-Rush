@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <!-- iPad: full viewport, no scaling that breaks keyboard -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Cluster Rush</title>
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            background: #222C36;
+            overflow: hidden;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        /* Full-screen responsive wrapper */
+        .template-wrap {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100% !important;
+            height: 100%;
+        }
+
+        .template-wrap canvas {
+            margin: 0;
+            position: relative;
+            z-index: 9;
+            width: 100% !important;
+            height: 100% !important;
+            display: block;
+        }
+    </style>
+
+    <script>
+        // ─── iPAD KEYBOARD FIX ──────────────────────────────────────────────────
+        // Block Safari from swallowing arrow keys / space (they scroll the page)
+        window.addEventListener('keydown', function(e) {
+            var blocked = ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' ','Space'];
+            if (blocked.indexOf(e.key) !== -1) e.preventDefault();
+        }, { passive: false });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var focusInterval = setInterval(function() {
+                var canvas = document.getElementById('canvas');
+                if (canvas) {
+                    clearInterval(focusInterval);
+                    if (canvas.tabIndex < 0) canvas.tabIndex = 0;
+                    canvas.focus();
+
+                    // Re-focus on any tap/click
+                    document.addEventListener('click', function() { canvas.focus(); });
+                    document.addEventListener('touchend', function() { canvas.focus(); });
+
+                    // Relay keyboard events to canvas if focus drifted
+                    document.addEventListener('keydown', function(e) {
+                        if (document.activeElement !== canvas) {
+                            canvas.dispatchEvent(new KeyboardEvent('keydown', {
+                                key: e.key, code: e.code, keyCode: e.keyCode,
+                                which: e.which, bubbles: true, cancelable: true
+                            }));
+                        }
+                    });
+                    document.addEventListener('keyup', function(e) {
+                        if (document.activeElement !== canvas) {
+                            canvas.dispatchEvent(new KeyboardEvent('keyup', {
+                                key: e.key, code: e.code, keyCode: e.keyCode,
+                                which: e.which, bubbles: true, cancelable: true
+                            }));
+                        }
+                    });
+                }
+            }, 300);
+        });
+
+        // ─── UNITY MODULE CONFIG ─────────────────────────────────────────────────
+        var Module = {
+            TOTAL_MEMORY: 268435456,
+            errorhandler: null,
+            compatibilitycheck: null,
+            backgroundColor: "#222C36",
+            splashStyle: "Dark",
+            dataUrl:  "https://cdn.jsdelivr.net/gh/classrooms-1/google.com@main/Release/NG.data",
+            codeUrl:  "https://cdn.jsdelivr.net/gh/classrooms-1/google.com@main/Release/NG.js",
+            asmUrl:   "https://cdn.jsdelivr.net/gh/classrooms-1/google.com@main/Release/NG.asm.js",
+            memUrl:   "https://cdn.jsdelivr.net/gh/classrooms-1/google.com@main/Release/NG.mem",
+        };
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/gh/classrooms-1/google.com@main/Release/UnityLoader.js"></script>
+</head>
+
+<body>
+    <div class="template-wrap clear">
+        <canvas class="emscripten" id="canvas"
+            oncontextmenu="event.preventDefault()"
+            height="600" width="900">
+        </canvas>
+    </div>
+</body>
+</html>
